@@ -76,7 +76,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	adminLoginRouter := router.Group("/admin_login")
-	store, err := sessions.NewRedisStore(10, "tcp", "172.31.230.85:6379", "", []byte("secret"))
+	store, err := sessions.NewRedisStore(10, "tcp", "172.31.230.85:6379", "123qweQWE@", []byte("secret"))
 	if err != nil {
 		log.Fatalf("sessions.NewRedisStore err:%v", err)
 	}

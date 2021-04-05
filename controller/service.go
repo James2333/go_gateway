@@ -162,8 +162,8 @@ func (service *ServiceController) ServiceDelete(c *gin.Context) {
 }
 
 // ServiceDetail godoc
-// @Summary 服务详情
-// @Description 服务详情
+// @Summary 查询服务详情
+// @Description 查询服务详情
 // @Tags 服务管理
 // @ID /service/service_detail
 // @Accept  json
@@ -228,7 +228,7 @@ func (service *ServiceController) ServiceStat(c *gin.Context) {
 		middleware.ResponseError(c, 2003, err)
 		return
 	}
-
+	
 	counter, err := public.FlowCounterHandler.GetCounter(public.FlowServicePrefix + serviceDetail.Info.ServiceName)
 	if err != nil {
 		middleware.ResponseError(c, 2004, err)

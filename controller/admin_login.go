@@ -36,7 +36,6 @@ func (adminlogin *AdminLoginController) AdminLogin(c *gin.Context) {
 		middleware.ResponseError(c, 2000, err)
 		return
 	}
-
 	//1. params.UserName 取得管理员信息 admininfo
 	//2. admininfo.salt + params.Password sha256 => saltPassword
 	//3. saltPassword==admininfo.password

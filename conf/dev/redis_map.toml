@@ -1,0 +1,12 @@
+# this is redis config file
+# 目前没用这个配置  redis的连接信息写在router/router.go下的 session.newredisstore下
+[list]
+    [list.default]
+        proxy_list = ["172.31.230.85:6379"]
+        max_active = 100
+        max_idle = 100
+        down_grade = false
+        db = 0
+        conn_timeout = 50
+        read_timeout = 100
+        write_timeout = 100

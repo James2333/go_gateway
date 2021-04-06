@@ -228,25 +228,25 @@ func (service *ServiceController) ServiceStat(c *gin.Context) {
 		middleware.ResponseError(c, 2003, err)
 		return
 	}
-	
+
 	counter, err := public.FlowCounterHandler.GetCounter(public.FlowServicePrefix + serviceDetail.Info.ServiceName)
 	if err != nil {
 		middleware.ResponseError(c, 2004, err)
 		return
 	}
 	todayList := []int64{}
-	currentTime:= time.Now()
+	currentTime := time.Now()
 	for i := 0; i <= currentTime.Hour(); i++ {
-		dateTime:=time.Date(currentTime.Year(),currentTime.Month(),currentTime.Day(),i,0,0,0,lib.TimeLocation)
-		hourData,_:=counter.GetHourData(dateTime)
+		dateTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), i, 0, 0, 0, lib.TimeLocation)
+		hourData, _ := counter.GetHourData(dateTime)
 		todayList = append(todayList, hourData)
 	}
 
 	yesterdayList := []int64{}
-	yesterTime:= currentTime.Add(-1*time.Duration(time.Hour*24))
+	yesterTime := currentTime.Add(-1 * time.Duration(time.Hour*24))
 	for i := 0; i <= 23; i++ {
-		dateTime:=time.Date(yesterTime.Year(),yesterTime.Month(),yesterTime.Day(),i,0,0,0,lib.TimeLocation)
-		hourData,_:=counter.GetHourData(dateTime)
+		dateTime := time.Date(yesterTime.Year(), yesterTime.Month(), yesterTime.Day(), i, 0, 0, 0, lib.TimeLocation)
+		hourData, _ := counter.GetHourData(dateTime)
 		yesterdayList = append(yesterdayList, hourData)
 	}
 	middleware.ResponseSuccess(c, &dto.ServiceStatOutput{
@@ -266,22 +266,25 @@ func (service *ServiceController) ServiceStat(c *gin.Context) {
 // @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /service/service_add_http [post]
 func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
+	//get传入的数据
 	params := &dto.ServiceAddHTTPInput{}
+	//验证数据格式是否正确
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2000, err)
 		return
 	}
-
+	//验证ip列表和权重列表数量是否一致
 	if len(strings.Split(params.IpList, ",")) != len(strings.Split(params.WeightList, ",")) {
 		middleware.ResponseError(c, 2004, errors.New("IP列表与权重列表数量不一致"))
 		return
 	}
-
+	//获取数据库连接池
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
 	}
+	//开始事务
 	tx = tx.Begin()
 	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
 	//查询服务名，若返回nil则服务已存在，返回err
@@ -297,7 +300,7 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 		middleware.ResponseError(c, 2003, errors.New("服务接入前缀或域名已存在"))
 		return
 	}
-
+	//把服务名称和描述先存进数据库，获取自增的id
 	serviceModel := &dao.ServiceInfo{
 		ServiceName: params.ServiceName,
 		ServiceDesc: params.ServiceDesc,
@@ -307,7 +310,7 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 		middleware.ResponseError(c, 2005, err)
 		return
 	}
-	//serviceModel.ID
+	//get自增的id后把id写入其他的表单的serviceID里
 	httpRule := &dao.HttpRule{
 		ServiceID:      serviceModel.ID,
 		RuleType:       params.RuleType,
@@ -323,7 +326,7 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 		middleware.ResponseError(c, 2006, err)
 		return
 	}
-
+	//同理写入control数据
 	accessControl := &dao.AccessControl{
 		ServiceID:         serviceModel.ID,
 		OpenAuth:          params.OpenAuth,
@@ -337,7 +340,7 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 		middleware.ResponseError(c, 2007, err)
 		return
 	}
-
+	//同上
 	loadbalance := &dao.LoadBalance{
 		ServiceID:              serviceModel.ID,
 		RoundType:              params.RoundType,
@@ -353,6 +356,7 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 		middleware.ResponseError(c, 2008, err)
 		return
 	}
+	//提交事务
 	tx.Commit()
 	middleware.ResponseSuccess(c, "")
 }

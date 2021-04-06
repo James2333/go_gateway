@@ -753,7 +753,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: 服务详情
+      description: 查询服务详情
       operationId: /service/service_detail
       parameters:
       - description: 服务ID
@@ -773,7 +773,7 @@ paths:
                 data:
                   $ref: '#/definitions/dao.ServiceDetail'
               type: object
-      summary: 服务详情
+      summary: 查询服务详情
       tags:
       - 服务管理
   /service/service_list:

@@ -378,7 +378,7 @@ var doc = `{
         },
         "/service/service_detail": {
             "get": {
-                "description": "服务详情",
+                "description": "查询服务详情",
                 "consumes": [
                     "application/json"
                 ],
@@ -388,7 +388,7 @@ var doc = `{
                 "tags": [
                     "服务管理"
                 ],
-                "summary": "服务详情",
+                "summary": "查询服务详情",
                 "operationId": "/service/service_detail",
                 "parameters": [
                     {

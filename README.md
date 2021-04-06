@@ -27,13 +27,13 @@ go mod使用请查阅：
 
 https://blog.csdn.net/e421083458/article/details/89762113
 ```
-git clone git@github.com:e421083458/go_gateway.git
+git clone https://github.com/James2333/go_gateway.git
 cd go_gateway
 go mod tidy
 ```
 - 确保正确配置了 conf/mysql_map.toml、conf/redis_map.toml：
 
-- 运行脚本
+- 运行sql脚本  这边建议直接用PHPadmin快速启动数据库，然后导入sql文件即可
 
 ```
 go run main.go
@@ -44,103 +44,64 @@ go run main.go
 [INFO]  start loading resources.
 [INFO]  success loading resources.
 ------------------------------------------------------------------------
-[GIN-debug] [WARNING] Now Gin requires Go 1.6 or later and Go 1.7 will be required soon.
-
-[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
-
-[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
- - using env:	export GIN_MODE=release
- - using code:	gin.SetMode(gin.ReleaseMode)
-
-[GIN-debug] GET    /demo/index               --> github.com/e421083458/go_gateway/controller.(*Demo).Index-fm (6 handlers)
-[GIN-debug] GET    /demo/bind                --> github.com/e421083458/go_gateway/controller.(*Demo).Bind-fm (6 handlers)
-[GIN-debug] GET    /demo/dao                 --> github.com/e421083458/go_gateway/controller.(*Demo).Dao-fm (6 handlers)
-[GIN-debug] GET    /demo/redis               --> github.com/e421083458/go_gateway/controller.(*Demo).Redis-fm (6 handlers)
+....
  [INFO] HttpServerRun::8880
-```
-- 测试mysql与请求链路
-
-创建测试表：
-```
-CREATE TABLE `area` (
- `id` bigint(20) NOT NULL AUTO_INCREMENT,
- `area_name` varchar(255) NOT NULL,
- `city_id` int(11) NOT NULL,
- `user_id` int(11) NOT NULL,
- `update_at` datetime NOT NULL,
- `create_at` datetime NOT NULL,
- `delete_at` datetime NOT NULL,
- PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='area';
-INSERT INTO `area` (`id`, `area_name`, `city_id`, `user_id`, `update_at`, `create_at`, `delete_at`) VALUES (NULL, 'area_name', '1', '2', '2019-06-15 00:00:00', '2019-06-15 00:00:00', '2019-06-15 00:00:00');
-```
-
-```
-curl 'http://127.0.0.1:8880/demo/dao?id=1'
-{
-    "errno": 0,
-    "errmsg": "",
-    "data": "[{\"id\":1,\"area_name\":\"area_name\",\"city_id\":1,\"user_id\":2,\"update_at\":\"2019-06-15T00:00:00+08:00\",\"create_at\":\"2019-06-15T00:00:00+08:00\",\"delete_at\":\"2019-06-15T00:00:00+08:00\"}]",
-    "trace_id": "c0a8fe445d05b9eeee780f9f5a8581b0"
-}
-
-查看链路日志（确认是不是一次请求查询，都带有相同trace_id）：
-tail -f go_gateway.inf.log
-
-[INFO][2019-06-16T11:39:26.802][log.go:58] _com_request_in||method=GET||from=127.0.0.1||traceid=c0a8fe445d05b9eeee780f9f5a8581b0||cspanid=||uri=/demo/dao?id=1||args=map[]||body=||spanid=9dad47aa57e9d186
-[INFO][2019-06-16T11:39:26.802][log.go:58] _com_mysql_success||affected_row=1||traceid=c0a8fe445d05b9ee07b80f9f66cb39b0||spanid=9dad47aa1408d2ac||source=/Users/niuyufu/go/src/github.com/e421083458/go_gateway/dao/demo.go:24||proc_time=0.000000000||sql=SELECT * FROM `area`  WHERE (id = '1')||level=sql||current_time=2019-06-16 11:39:26||cspanid=
-[INFO][2019-06-16T11:39:26.802][log.go:58] _com_request_out||method=GET||args=map[]||proc_time=0.025019164||traceid=c0a8fe445d05b9eeee780f9f5a8581b0||spanid=9dad47aa57e9d186||uri=/demo/dao?id=1||from=127.0.0.1||response={\"errno\":0,\"errmsg\":\"\",\"data\":\"[{\\\"id\\\":1,\\\"area_name\\\":\\\"area_name\\\",\\\"city_id\\\":1,\\\"user_id\\\":2,\\\"update_at\\\":\\\"2019-06-15T00:00:00+08:00\\\",\\\"create_at\\\":\\\"2019-06-15T00:00:00+08:00\\\",\\\"delete_at\\\":\\\"2019-06-15T00:00:00+08:00\\\"}]\",\"trace_id\":\"c0a8fe445d05b9eeee780f9f5a8581b0\"}||cspanid=
-```
-- 测试参数绑定与多语言验证
-
-```
-curl 'http://127.0.0.1:8880/demo/bind?name=name&locale=zh'
-{
-    "errno": 500,
-    "errmsg": "年龄为必填字段,密码为必填字段",
-    "data": "",
-    "trace_id": "c0a8fe445d05badae8c00f9fb62158b0"
-}
-
-curl 'http://127.0.0.1:8880/demo/bind?name=name&locale=en'
-{
-    "errno": 500,
-    "errmsg": "Age is a required field,Passwd is a required field",
-    "data": "",
-    "trace_id": "c0a8fe445d05bb4cd3b00f9f3a768bb0"
-}
 ```
 
 ### 文件分层
 ```
-├── README.md
-├── conf            配置文件夹
-│   └── dev
-│       ├── base.toml
-│       ├── mysql_map.toml
-│       └── redis_map.toml
-├── controller      控制器
-│   └── demo.go
-├── dao             DB数据层
-│   └── demo.go
-├── docs            swagger文件层
-├── dto             输入输出结构层
-│   └── demo.go
+.
+├── conf   配置文件夹
+│   └── dev
+│       ├── base.toml
+│       ├── mysql_map.toml
+│       └── redis_map.toml
+├── controller   控制层
+│   ├── admin.go
+│   ├── admin_login.go
+│   └── service.go
+├── dao    DB数据层
+│   ├── admin.go
+│   ├── service_access_control.go
+│   ├── service.go
+│   ├── service_grpc_rule.go
+│   ├── service_http_rule.go
+│   ├── service_info.go
+│   ├── service_load_balance.go
+│   └── service_tcp_rule.go
+├── docs   swagger文件层
+│   ├── docs.go
+│   ├── swagger.json
+│   └── swagger.yaml
+├── dto     输入输出结构层
+│   ├── admin.go
+│   ├── admin_login.go
+│   ├── dashboard.go
+│   └── service.go
+├── go
 ├── go.mod
 ├── go.sum
-├── main.go         入口文件
-├── middleware      中间件层
-│   ├── panic.go
-│   ├── response.go
-│   ├── token_auth.go
-│   └── translation.go
-├── public          公共文件
-│   ├── log.go
-│   ├── mysql.go
-│   └── validate.go
-└── router          路由层
+├── logs    收集的日志文件
+│   ├── gin_scaffold.inf.log
+│   └── gin_scaffold.wf.log
+├── main.go
+├── middleware   中间件层
+│   ├── ip_auth.go
+│   ├── recovery.go
+│   ├── request_log.go
+│   ├── response.go
+│   ├── session_auth.go
+│   └── translation.go
+├── public    公共文件
+│   .....
+├── README.md
+├── reverse_proxy
+│   └── load_balance   负载均衡算法
+│        .....
+└── router     路由层
     ├── httpserver.go
     └── route.go
+
 ```
 
 ### log / redis / mysql / http.client 常用方法
@@ -152,7 +113,7 @@ curl 'http://127.0.0.1:8880/demo/bind?name=name&locale=en'
 
 https://github.com/swaggo/swag/releases
 
-- 下载对应操作系统的执行文件到$GOPATH/bin下面
+- linux/mac 下载对应操作系统的执行文件到$GOPATH/bin下面
 
 如下：
 ```
@@ -160,7 +121,19 @@ https://github.com/swaggo/swag/releases
 total 434168
 -rwxr-xr-x  1 niuyufu  staff    13M  4  3 17:38 swag
 ```
+- windows下需要找到GOPATH下的github文件夹下的swaggo文件
 
+先执行：
+```
+go get -u github.com/swaggo/swag/cmd/swag
+```
+然后找到$GOPATH/pkg\mod\github.com\swaggo\swag@*
+这个路径下，cmd中执行 go install 即可安装swag成功
+然后回到项目路径下
+```
+swag init && go run main.go 
+```
+生成接口文档并启动项目。
 - 设置接口文档参考： `controller/demo.go` 的 Bind方法的注释设置
 
 ```
@@ -178,3 +151,4 @@ total 434168
 
 - 生成接口文档：`swag init`
 - 然后启动服务器：`go run main.go`，浏览地址: http://127.0.0.1:8880/swagger/index.html
+

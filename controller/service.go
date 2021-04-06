@@ -121,6 +121,7 @@ func (service *ServiceController) ServiceList(c *gin.Context) {
 		List:  outList,
 	}
 	middleware.ResponseSuccess(c, out)
+	return
 }
 
 // ServiceDelete godoc
@@ -159,6 +160,7 @@ func (service *ServiceController) ServiceDelete(c *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(c, "")
+	return
 }
 
 // ServiceDetail godoc
@@ -197,6 +199,7 @@ func (service *ServiceController) ServiceDetail(c *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(c, serviceDetail)
+	return
 }
 
 // ServiceStat godoc
@@ -253,6 +256,7 @@ func (service *ServiceController) ServiceStat(c *gin.Context) {
 		Today:     todayList,
 		Yesterday: yesterdayList,
 	})
+	return
 }
 
 // ServiceAddHTTP godoc
@@ -359,6 +363,7 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 	//提交事务
 	tx.Commit()
 	middleware.ResponseSuccess(c, "")
+	return
 }
 
 // ServiceUpdateHTTP godoc
@@ -450,6 +455,7 @@ func (service *ServiceController) ServiceUpdateHTTP(c *gin.Context) {
 	}
 	tx.Commit()
 	middleware.ResponseSuccess(c, "")
+	return
 }
 
 // ServiceAddHttp godoc
